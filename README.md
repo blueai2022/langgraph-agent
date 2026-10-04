@@ -1,7 +1,7 @@
 # LangGraph Agent
 
 The agent calls RAG-based retrieval as a *tool*, so it does not make a mistake due to poor
-"memory" — a non-existent ICD-10 code.
+"memory" - a non-existent ICD-10 code.
 
 The agent loop and tool execution are provided by LangGraph (`StateGraph` + `ToolNode` +
 `ChatOpenAI`); the RAG layer is exposed as a LangChain `BaseRetriever`.

@@ -31,7 +31,7 @@ class EmbeddingBackend:
         self._client = OpenAIEmbeddings(
             model=model,
             base_url=base_url,
-            api_key=api_key or "",
+            api_key=api_key or "sk-",
             check_embedding_ctx_length=False, # to avoid tiktoken requirement
         )
 

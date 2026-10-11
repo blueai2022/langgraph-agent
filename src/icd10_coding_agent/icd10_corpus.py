@@ -33,9 +33,9 @@ class CorpusEntry:
 
 
     code: str
-    description: str
-    category: str
-    billable: bool
+    description: str | None = None
+    category: str | None = None
+    billable: bool | None = None
     clinical_notes: ClinicalNotes = field(default_factory=ClinicalNotes)
 
 

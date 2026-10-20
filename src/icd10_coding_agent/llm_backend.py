@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from langchain_core.prompts import StringPromptTemplate
 from langchain_core.retrievers import BaseRetriever
-from langchain_core.tools import create_retriever_tool
+from langchain_core.tools import StructuredTool, create_retriever_tool
 from langchain_openai import ChatOpenAI
 
 
@@ -49,7 +49,7 @@ class _DocumentPrompt(StringPromptTemplate):
 _DOCUMENT_PROMPT = _DocumentPrompt()
 
 
-def build_search_tool(retriever: BaseRetriever):
+def build_search_tool(retriever: BaseRetriever) -> StructuredTool:
     """Create the ``search`` tool from a retriever, preserving code and score."""
     return create_retriever_tool(
         retriever,

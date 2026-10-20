@@ -44,7 +44,7 @@ class Corpus:
 
     def __init__(self, entries: Iterable[CorpusEntry]) -> None:
         self._entries: tuple[CorpusEntry, ...] = tuple(entries)
-        self._by_code: Mapping[str, CorpusEntry] = {
+        self._by_code: dict[str, CorpusEntry] = {
             entry.code.casefold(): entry for entry in self._entries
         }
 

@@ -80,7 +80,7 @@ def build_coding_graph(
 ) -> CompiledStateGraph:
     """Build and compile a state graph for the ICD-10 coding agent."""
     model = llm.bind_tools(tools)
-    tools = ToolNode(tools)
+    tool_node = ToolNode(tools)
 
     def call_model(state: AgentState) -> dict[str, Any]:
         reply = model.invoke(state.messages)
@@ -113,7 +113,7 @@ def build_coding_graph(
 
     graph = StateGraph(AgentState)
     graph.add_node("call_model", call_model)
-    graph.add_node("tools", tools)
+    graph.add_node("tools", tool_node)
     graph.add_node("validate", validate)
 
     graph.add_edge(START, "call_model")

@@ -150,7 +150,7 @@ def _build_corpus(records: Sequence[_RawRecord]) -> Corpus:
                     inclusion_terms=record.inclusion_terms,
                     excludes=record.excludes,
                     cross_references=record.cross_references,
-                ),
+                )
             )
         )
     return Corpus(entries)

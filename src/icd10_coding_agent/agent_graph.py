@@ -78,42 +78,42 @@ def build_coding_graph(
     *,
     max_retries: int = DEFAULT_MAX_RETRIES,
 ) -> CompiledStateGraph:
-    """Build and compile the coding agent as a LangGraph `StateGraph`."""
+    """Build and compile a state graph for the ICD-10 coding agent."""
     model = llm.bind_tools(tools)
-    tool_node = ToolNode(tools)
+    tools = ToolNode(tools)
 
     def call_model(state: AgentState) -> dict[str, Any]:
-        reply = model.invoke(state["messages"])
+        reply = model.invoke(state.messages)
         return {"messages": [reply]}
 
     def route_after_model(state: AgentState) -> Literal["tools", "validate"]:
-        last = state["messages"][-1]
+        last = state.messages[-1]
         if isinstance(last, AIMessage) and last.tool_calls:
             return "tools"
         return "validate"
 
     def validate(state: AgentState) -> dict[str, Any]:
-        last = state["messages"][-1]
+        last = state.messages[-1]
         content = last.content if isinstance(last, AIMessage) else None
         answer = _parse_answer(content)
         if answer is not None and (answer.code or answer.reason):
             return {"final_answer": answer}
-        retries = int(state.get("retries", 0)) + 1
+        retries = state.retries + 1
         if retries > max_retries:
-            raise AgentError(f"model failed to produce a valid answer after {max_retries} retries")
+            raise AgentError(f"model failed to produce a valid response in {max_retries+1} tries.")
         return {
             "retries": retries,
-            "messages": [HumanMessage(content=_retry_prompt(answer))],
+            "messages": [HumanMessage(content=_retry_prompt(answer))]
         }
 
     def route_after_validate(state: AgentState) -> Literal["call_model"] | str:
-        if state.get("final_answer") is not None:
-            return END
-        return "call_model"
+        if state.final_answer is None:
+            return "call_model"
+        return END
 
     graph = StateGraph(AgentState)
     graph.add_node("call_model", call_model)
-    graph.add_node("tools", tool_node)
+    graph.add_node("tools", tools)
     graph.add_node("validate", validate)
 
     graph.add_edge(START, "call_model")
@@ -127,17 +127,15 @@ def build_coding_graph(
     return graph.compile()
 
 
-def _initial_state(case: CaseInput, system_prompt: str) -> dict[str, Any]:
-    return {
-        "messages": [
-            SystemMessage(content=system_prompt),
+def _initial_state(case: CaseInput, prompt: str) -> AgentState:
+    return AgentState(
+        messages=[
+            SystemMessage(content=prompt),
             HumanMessage(content=_user_message(case)),
         ],
-        "evidence": case.evidence,
-        "upstream_candidate_code": case.upstream_candidate_code,
-        "retries": 0,
-        "final_answer": None,
-    }
+        evidence=case.evidence,
+        upstream_candidate_code=case.upstream_candidate_code,
+    )
 
 
 def _user_message(case: CaseInput) -> str:

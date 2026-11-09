@@ -127,10 +127,10 @@ def build_coding_graph(
     return graph.compile()
 
 
-def _initial_state(case: CaseInput, prompt: str) -> AgentState:
+def _initial_state(case: CaseInput, system_prompt: str) -> AgentState:
     return AgentState(
         messages=[
-            SystemMessage(content=prompt),
+            SystemMessage(content=system_prompt),
             HumanMessage(content=_user_message(case)),
         ],
         evidence=case.evidence,

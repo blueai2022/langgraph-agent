@@ -103,7 +103,7 @@ def build_coding_graph(
             raise AgentError(f"model failed to produce a valid response in {max_retries+1} tries.")
         return {
             "retries": retries,
-            "messages": [HumanMessage(content=_retry_prompt(answer))]
+            "messages": [HumanMessage(content=_retry_prompt(answer))],
         }
 
     def route_after_validate(state: AgentState) -> Literal["call_model"] | str:
